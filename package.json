@@ -5,23 +5,35 @@
   "main": "server.ts",
   "scripts": {
     "db:init": "tsx src/database/init.ts",
-    "watch": "tsc-watch --esModuleInterop src/server.ts --outDir ./dist --onSuccess 'node ./dist/server.js'",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "tsc": "tsc"
+    "server:dev": "tsx watch src/server.ts",
+    "server:run": "tsx src/server.ts",
+    "migrate:create": "db-migrate create --sql-file -e deploy",
+    "migrate:up": "db-migrate up -r tsx --no-compilation -e deploy",
+    "migrate:down": "db-migrate down -r tsx --no-compilation -e deploy",
+    "migrate:test:up": "db-migrate up -r tsx --no-compilation -e test",
+    "migrate:test:down": "db-migrate reset -r tsx --no-compilation -e test",
+    "test": "yarn migrate:test:up && tsx src/helpers/reporter.ts && yarn migrate:test:down"
   },
   "author": "Udacity",
   "license": "ISC",
   "dependencies": {
+    "db-migrate": "^0.11.14",
+    "db-migrate-pg": "^1.5.2",
     "dotenv": "^17.4.2",
     "express": "^4.17.1",
+    "jwt": "^0.2.0",
     "pg": "^8.21.0",
+    "ts-node": "^10.9.2",
     "yarn": "^1.22.22"
   },
   "devDependencies": {
     "@types/connect": "^3.4.38",
     "@types/express": "^5.0.6",
+    "@types/jasmine": "^6.0.0",
     "@types/node": "^25.9.3",
     "@types/pg": "^8.20.0",
+    "jasmine": "^6.3.0",
+    "jasmine-spec-reporter": "^7.0.0",
     "tsc-watch": "^4.2.9",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3"
