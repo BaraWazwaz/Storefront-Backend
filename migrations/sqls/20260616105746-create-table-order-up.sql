@@ -1,0 +1,5 @@
+CREATE TABLE Orders (
+    id      SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL REFERENCES AppUser(id) ON DELETE CASCADE,
+    status  VARCHAR(20) NOT NULL DEFAULT 'active'
+);

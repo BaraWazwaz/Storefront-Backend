@@ -1,5 +1,5 @@
 import env from '../env';
-import pg, { Client } from 'pg';
+import { Client } from 'pg';
 
 const {
     DB_POSTGRES_PASSWORD,
@@ -43,6 +43,13 @@ async function setupDatabase() {
             const statuses = await Promise.all(promises);
             return statuses.every(x => x);
         };
+
+        // Drop existing databases and roles if they exist
+        console.log('Dropping existing databases and users if they exist...');
+        await client.query(`DROP DATABASE IF EXISTS ${DB_TEST_DB} WITH (FORCE);`);
+        await client.query(`DROP DATABASE IF EXISTS ${DB_DEPLOY_DB} WITH (FORCE);`);
+        await client.query(`DROP USER IF EXISTS ${DB_TEST_USER};`);
+        await client.query(`DROP USER IF EXISTS ${DB_DEPLOY_USER};`);
 
         if (await runQueries(client, [
             `CREATE USER ${DB_TEST_USER} WITH PASSWORD '${DB_TEST_PASSWORD}';`,

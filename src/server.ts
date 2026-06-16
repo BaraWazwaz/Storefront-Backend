@@ -1,12 +1,30 @@
-import express, { Request, Response } from 'express'
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import userRouter from './routes/users';
+import productRouter from './routes/products';
+import orderRouter from './routes/orders';
 
-const app  = express();
+const app = express();
 const port = 3000;
 
-// alternative to bodyParser, because it is depricated
+// Configure CORS
+app.use(cors());
+
+// Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', (req: Request, res: Response) => res.send('Hello World!'));
+// Routes
+app.use('/users', userRouter);
+app.use('/products', productRouter);
+app.use('/orders', orderRouter);
 
-app.listen(port, () => console.log(`starting app on: http://localhost:${port}`));
+app.get('/', (req: Request, res: Response) => {
+    res.send('Hello World!');
+});
+
+app.listen(port, () => {
+    console.log(`starting app on: http://localhost:${port}`);
+});
+
+export default app;
