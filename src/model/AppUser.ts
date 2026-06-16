@@ -69,15 +69,15 @@ export class AppUserStore {
     async authenticate(firstName: string, lastName: string, password: string): Promise<AppUser | null> {
         try {
             const sql = 'SELECT id, firstName, lastName, password FROM AppUser WHERE firstName = $1 AND lastName = $2;';
-            const result = await query(sql, [firstName, lastName]);
+            const result = await query(sql, [firstName, lastName]) as AppUser[];
             if (result.length > 0) {
-                const user = result[0] as any;
-                const isCorrect = await bcrypt.compare(password + pepper, user.password);
+                const user = result[0];
+                const isCorrect = await bcrypt.compare(password + pepper, user.password as string);
                 if (isCorrect) {
                     return {
                         id: user.id,
-                        firstName: user.firstname,
-                        lastName: user.lastname
+                        firstName: user.firstName,
+                        lastName: user.lastName
                     };
                 }
             }

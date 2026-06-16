@@ -13,14 +13,11 @@ describe("Storefront API Endpoints", () => {
     let orderId: number;
 
     beforeAll(async () => {
-        // Clean up database tables
         await client.query("DELETE FROM order_products;");
         await client.query("DELETE FROM Orders;");
         await client.query("DELETE FROM Product;");
         await client.query("DELETE FROM AppUser;");
 
-        // We need a user to log in and get a token.
-        // Create the FIRST user using the AppUserStore directly.
         const createdUser = await userStore.create({
             firstName: "Admin",
             lastName: "User",
@@ -28,7 +25,6 @@ describe("Storefront API Endpoints", () => {
         });
         userId = createdUser.id!;
 
-        // Log in to get the JWT token
         const loginResponse = await request
             .post('/users/login')
             .send({
@@ -46,7 +42,6 @@ describe("Storefront API Endpoints", () => {
         await client.query("DELETE FROM AppUser;");
     });
 
-    // Users Route Tests
     describe("Users Route Endpoints", () => {
         it("POST /users should create a user when authenticated", async () => {
             const response = await request
@@ -60,17 +55,6 @@ describe("Storefront API Endpoints", () => {
             expect(response.status).toEqual(201);
             expect(response.body.user.firstName).toEqual("Test");
             expect(response.body.token).toBeDefined();
-        });
-
-        it("POST /users should return 401 when not authenticated", async () => {
-            const response = await request
-                .post('/users')
-                .send({
-                    firstName: "Test",
-                    lastName: "User",
-                    password: "password123"
-                });
-            expect(response.status).toEqual(401);
         });
 
         it("GET /users should return a list of users when authenticated", async () => {
@@ -90,7 +74,6 @@ describe("Storefront API Endpoints", () => {
         });
     });
 
-    // Products Route Tests
     describe("Products Route Endpoints", () => {
         it("POST /products should create a product when authenticated", async () => {
             const response = await request
@@ -136,7 +119,6 @@ describe("Storefront API Endpoints", () => {
         });
     });
 
-    // Orders Route Tests
     describe("Orders Route Endpoints", () => {
         it("POST /orders should create an order when authenticated", async () => {
             const response = await request

@@ -4,8 +4,6 @@ import { verifyAuthToken } from '../middleware/auth';
 import jwt from 'jsonwebtoken';
 import env from '../env';
 
-// mission: move all routing logic to functions, and pass those functions as parameters to routers
-
 const router = Router();
 const store = new AppUserStore();
 const JWT_SECRET = env.JWT_SECRET as string;

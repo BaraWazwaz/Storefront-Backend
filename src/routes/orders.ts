@@ -5,10 +5,9 @@ import { verifyAuthToken } from '../middleware/auth';
 const router = Router();
 const store = new OrderStore();
 
-// GET /orders/current/:userId
-router.get('/current/:userId', verifyAuthToken as any, async (req: Request, res: Response) => {
+router.get('/current/:userId', verifyAuthToken, async (req: Request, res: Response) => {
     try {
-        const userId = parseInt(req.params.userId, 10);
+        const userId = parseInt(req.params.userId as string, 10);
         if (isNaN(userId)) {
             res.status(400).json({ error: 'Invalid user ID' });
             return;
@@ -24,10 +23,9 @@ router.get('/current/:userId', verifyAuthToken as any, async (req: Request, res:
     }
 });
 
-// GET /orders/completed/:userId
-router.get('/completed/:userId', verifyAuthToken as any, async (req: Request, res: Response) => {
+router.get('/completed/:userId', verifyAuthToken, async (req: Request, res: Response) => {
     try {
-        const userId = parseInt(req.params.userId, 10);
+        const userId = parseInt(req.params.userId as string, 10);
         if (isNaN(userId)) {
             res.status(400).json({ error: 'Invalid user ID' });
             return;
@@ -39,8 +37,7 @@ router.get('/completed/:userId', verifyAuthToken as any, async (req: Request, re
     }
 });
 
-// POST /orders
-router.post('/', verifyAuthToken as any, async (req: Request, res: Response) => {
+router.post('/', verifyAuthToken, async (req: Request, res: Response) => {
     try {
         const { userId, status } = req.body;
         if (!userId) {
@@ -54,12 +51,11 @@ router.post('/', verifyAuthToken as any, async (req: Request, res: Response) => 
     }
 });
 
-// POST /orders/:id/products
-router.post('/:id/products', verifyAuthToken as any, async (req: Request, res: Response) => {
+router.post('/:id/products', verifyAuthToken, async (req: Request, res: Response) => {
     try {
-        const orderId = parseInt(req.params.id, 10);
+        const orderId = parseInt(req.params.id as string, 10);
         const { productId, quantity } = req.body;
-        
+
         if (isNaN(orderId)) {
             res.status(400).json({ error: 'Invalid order ID' });
             return;
@@ -80,12 +76,11 @@ router.post('/:id/products', verifyAuthToken as any, async (req: Request, res: R
     }
 });
 
-// PUT /orders/:id/status
-router.put('/:id/status', verifyAuthToken as any, async (req: Request, res: Response) => {
+router.put('/:id/status', verifyAuthToken, async (req: Request, res: Response) => {
     try {
-        const orderId = parseInt(req.params.id, 10);
+        const orderId = parseInt(req.params.id as string, 10);
         const { status } = req.body;
-        
+
         if (isNaN(orderId)) {
             res.status(400).json({ error: 'Invalid order ID' });
             return;

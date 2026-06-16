@@ -7,7 +7,6 @@ describe("AppUser Model", () => {
     let userId: number;
 
     beforeAll(async () => {
-        // Clean up users table
         await client.query("DELETE FROM AppUser;");
     });
 

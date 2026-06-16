@@ -7,14 +7,11 @@ import orderRouter from './routes/orders';
 const app = express();
 const port = 3000;
 
-// Configure CORS
 app.use(cors());
 
-// Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
 app.use('/users', userRouter);
 app.use('/products', productRouter);
 app.use('/orders', orderRouter);

@@ -33,6 +33,7 @@
     "@types/bcrypt": "^6.0.0",
     "@types/connect": "^3.4.38",
     "@types/cors": "^2.8.19",
+    "@types/dotenv": "^8.2.3",
     "@types/express": "^5.0.6",
     "@types/jasmine": "^6.0.0",
     "@types/jsonwebtoken": "^9.0.10",
