@@ -6,14 +6,14 @@ jasmineRunner.env.clearReporters();
 jasmineRunner.env.addReporter(
   new SpecReporter({
     spec: {
-      displayPending: true,                   // Show pending/skipped specs
-      displayDuration: true,                  // Show test execution time
-      displayStacktrace: StacktraceOption.RAW // Display stack traces in full
+      displayPending: true,
+      displayDuration: true,
+      displayStacktrace: StacktraceOption.RAW
     },
     summary: {
-      displayDuration: true,                  // Show total execution time in summary
-      displayFailed: true,                    // Show summary of failed tests
-      displayPending: false                   // Hide pending from summary
+      displayDuration: true,
+      displayFailed: true,
+      displayPending: false
     }
   })
 );

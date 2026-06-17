@@ -4,11 +4,11 @@ import env from '../env';
 
 const JWT_SECRET = env.JWT_SECRET || 'shopping_storefront_secret';
 
-export interface CustomRequest extends Request {
-    user?: any;
+export interface RequestWithUser extends Request {
+    user?: string | jwt.JwtPayload;
 }
 
-export function verifyAuthToken(req: CustomRequest, res: Response, next: NextFunction): void {
+export function verifyAuthToken(req: RequestWithUser, res: Response, next: NextFunction): void {
     try {
         const authorizationHeader = req.headers.authorization;
         if (!authorizationHeader) {

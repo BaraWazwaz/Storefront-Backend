@@ -1,11 +1,10 @@
 import { Router, Request, Response } from 'express';
-import AppUser, { AppUserStore } from '../model/AppUser';
+import AppUser, { storeAppUser } from '../model/AppUser';
 import { verifyAuthToken } from '../middleware/auth';
 import jwt from 'jsonwebtoken';
 import env from '../env';
 
 const router = Router();
-const store = new AppUserStore();
 const JWT_SECRET = env.JWT_SECRET as string;
 
 function generateToken(user: AppUser): string {
@@ -18,7 +17,7 @@ function generateToken(user: AppUser): string {
 
 router.get('/', verifyAuthToken, async (req: Request, res: Response) => {
     try {
-        const users = await store.index();
+        const users = await storeAppUser.index();
         res.json(users);
     } catch (err) {
         res.status(500).json({ error: (err as Error).message });
@@ -32,7 +31,7 @@ router.get('/:id', verifyAuthToken, async (req: Request, res: Response) => {
             res.status(400).json({ error: 'Invalid user ID' });
             return;
         }
-        const user = await store.show(id);
+        const user = await storeAppUser.show(id);
         res.json(user);
     } catch (err) {
         res.status(404).json({ error: (err as Error).message });
@@ -46,7 +45,7 @@ router.post('/', async (req: Request, res: Response) => {
             res.status(400).json({ error: 'firstName, lastName, and password are required' });
             return;
         }
-        const user = await store.create({ firstName, lastName, password });
+        const user = await storeAppUser.create({ firstName, lastName, password });
         const token = generateToken(user);
         res.status(201).json({ user, token });
     } catch (err) {
@@ -61,7 +60,7 @@ router.post('/login', async (req: Request, res: Response) => {
             res.status(400).json({ error: 'firstName, lastName, and password are required' });
             return;
         }
-        const user = await store.authenticate(firstName, lastName, password);
+        const user = await storeAppUser.authenticate(firstName, lastName, password);
         if (!user) {
             res.status(401).json({ error: 'Invalid user credentials' });
             return;

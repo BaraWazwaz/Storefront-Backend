@@ -1,5 +1,5 @@
 import env from '../env';
-import { Pool } from 'pg';
+import { Pool, QueryArrayResult } from 'pg';
 
 const {
     DB_TEST_USER,
@@ -12,15 +12,15 @@ const {
 } = env;
 
 const client = new Pool({
-    host:     'localhost',
-    database: MODE === 'test' ? DB_TEST_DB       : DB_DEPLOY_DB,
-    user:     MODE === 'test' ? DB_TEST_USER     : DB_DEPLOY_USER,
+    host: 'localhost',
+    database: MODE === 'test' ? DB_TEST_DB : DB_DEPLOY_DB,
+    user: MODE === 'test' ? DB_TEST_USER : DB_DEPLOY_USER,
     password: MODE === 'test' ? DB_TEST_PASSWORD : DB_DEPLOY_PASSWORD
 });
 
 export default client;
 
-export async function query(sql: string, args: unknown[]) {
+export async function query(sql: string, args: unknown[]): Promise<unknown[]> {
     try {
         const session = await client.connect();
         const result = await session.query(sql, args);

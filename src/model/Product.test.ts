@@ -1,4 +1,7 @@
-import { ProductStore } from './Product';
+import { ProductStore, ProductWithPopularity } from './Product';
+import { storeAppUser } from './AppUser';
+import { storeOrder } from './Order';
+import { storeOrderProduct } from './OrderProduct';
 import client from '../database/client';
 
 const store = new ProductStore();
@@ -7,11 +10,17 @@ describe("Product Model", () => {
     let productId: number;
 
     beforeAll(async () => {
+        await client.query("DELETE FROM order_products;");
+        await client.query("DELETE FROM Orders;");
         await client.query("DELETE FROM Product;");
+        await client.query("DELETE FROM AppUser;");
     });
 
     afterAll(async () => {
+        await client.query("DELETE FROM order_products;");
+        await client.query("DELETE FROM Orders;");
         await client.query("DELETE FROM Product;");
+        await client.query("DELETE FROM AppUser;");
     });
 
     it("should have an index method", () => {
@@ -24,10 +33,6 @@ describe("Product Model", () => {
 
     it("should have a create method", () => {
         expect(store.create).toBeDefined();
-    });
-
-    it("should have a top5Popular method", () => {
-        expect(store.top5Popular).toBeDefined();
     });
 
     it("should have a byCategory method", () => {
@@ -70,5 +75,48 @@ describe("Product Model", () => {
     it("byCategory method should return empty list for unused category", async () => {
         const result = await store.byCategory("Books");
         expect(result.length).toEqual(0);
+    });
+
+    describe("top5Popular", () => {
+        let uId: number;
+        let oId: number;
+        let pIds: number[] = [];
+
+        beforeAll(async () => {
+            await client.query("DELETE FROM order_products;");
+            await client.query("DELETE FROM Orders;");
+            await client.query("DELETE FROM Product;");
+            await client.query("DELETE FROM AppUser;");
+
+            const user = await storeAppUser.create({
+                firstName: "Top5",
+                lastName: "User",
+                password: "password123"
+            });
+            uId = user.id!;
+
+            const product = await store.create({
+                name: "PopProduct",
+                price: 10,
+                category: "Gadgets"
+            });
+            pIds.push(product.id!);
+
+            const order = await storeOrder.create({ userId: uId, status: "active" });
+            oId = order.id!;
+
+            await storeOrderProduct.addProductToOrder(oId, pIds[0], 10);
+        });
+
+        it("should have a top5Popular method", () => {
+            expect(store.top5Popular).toBeDefined();
+        });
+
+        it("should return popular products with correct structure and productsCount", async () => {
+            const result = await store.top5Popular();
+            expect(result.length).toBeGreaterThan(0);
+            expect(result[0].name).toEqual("PopProduct");
+            expect(result[0].productsCount).toEqual(10);
+        });
     });
 });

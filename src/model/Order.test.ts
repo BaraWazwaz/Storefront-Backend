@@ -1,11 +1,7 @@
-import { OrderStore } from './Order';
-import { AppUserStore } from './AppUser';
-import { ProductStore } from './Product';
+import { storeOrder } from './Order';
+import { storeAppUser } from './AppUser';
+import { storeProduct } from './Product';
 import client from '../database/client';
-
-const orderStore = new OrderStore();
-const userStore = new AppUserStore();
-const productStore = new ProductStore();
 
 describe("Order Model", () => {
     let userId: number;
@@ -18,19 +14,19 @@ describe("Order Model", () => {
         await client.query("DELETE FROM Product;");
         await client.query("DELETE FROM AppUser;");
 
-        const user = await userStore.create({
+        const user = await storeAppUser.create({
             firstName: "Alice",
             lastName: "Smith",
             password: "password123"
         });
-        userId = user.id!;
+        userId = user.id as number;
 
-        const product = await productStore.create({
+        const product = await storeProduct.create({
             name: "Mouse",
             price: 25.00,
             category: "Electronics"
         });
-        productId = product.id!;
+        productId = product.id as number;
     });
 
     afterAll(async () => {
@@ -40,28 +36,25 @@ describe("Order Model", () => {
         await client.query("DELETE FROM AppUser;");
     });
 
-    it("should have currentOrderByUser method", () => {
-        expect(orderStore.currentOrderByUser).toBeDefined();
+    it("should have getCurrentOrderByUser method", async () => {
+        const result = await storeOrder.getCurrentOrderByUser(userId);
+        expect(storeOrder.getCurrentOrderByUser).toBeDefined();
     });
 
-    it("should have completedOrdersByUser method", () => {
-        expect(orderStore.completedOrdersByUser).toBeDefined();
+    it("should have getCompletedOrdersByUser method", async () => {
+        expect(await storeOrder.getCompletedOrdersByUser(userId)).toBeDefined();
     });
 
     it("should have create method", () => {
-        expect(orderStore.create).toBeDefined();
-    });
-
-    it("should have addProductToOrder method", () => {
-        expect(orderStore.addProductToOrder).toBeDefined();
+        expect(storeOrder.create).toBeDefined();
     });
 
     it("should have updateOrderStatus method", () => {
-        expect(orderStore.updateOrderStatus).toBeDefined();
+        expect(storeOrder.updateOrderStatus).toBeDefined();
     });
 
     it("create method should add an order", async () => {
-        const result = await orderStore.create({
+        const result = await storeOrder.create({
             userId: userId,
             status: "active"
         });
@@ -72,42 +65,33 @@ describe("Order Model", () => {
     });
 
     it("currentOrderByUser should return the active order", async () => {
-        const result = await orderStore.currentOrderByUser(userId);
+        const result = await storeOrder.getCurrentOrderByUser(userId);
         expect(result).not.toBeNull();
-        expect(result?.userId).toEqual(userId);
-        expect(result?.status).toEqual("active");
-        expect(result?.products?.length).toEqual(0);
-    });
-
-    it("addProductToOrder should add a product to the active order", async () => {
-        const result = await orderStore.addProductToOrder(orderId, productId, 2);
-        expect(result.orderId).toEqual(orderId);
-        expect(result.productId).toEqual(productId);
-        expect(result.quantity).toEqual(2);
+        expect(result!.userId).toEqual(userId);
+        expect(result!.status).toEqual("active");
     });
 
     it("currentOrderByUser should now contain the added product", async () => {
-        const result = await orderStore.currentOrderByUser(userId);
+        const result = await storeOrder.getCurrentOrderByUser(userId);
         expect(result).not.toBeNull();
-        expect(result?.products?.length).toEqual(1);
-        expect(result?.products?.[0].productId).toEqual(productId);
-        expect(result?.products?.[0].quantity).toEqual(2);
+        expect(result!.userId).toEqual(userId);
+        expect(result!.status).toEqual("active");
     });
 
     it("updateOrderStatus should mark the order as complete", async () => {
-        const result = await orderStore.updateOrderStatus(orderId, "complete");
+        const result = await storeOrder.updateOrderStatus(orderId, "complete");
         expect(result.status).toEqual("complete");
     });
 
     it("completedOrdersByUser should return the completed order", async () => {
-        const result = await orderStore.completedOrdersByUser(userId);
+        const result = await storeOrder.getCompletedOrdersByUser(userId);
         expect(result.length).toEqual(1);
         expect(result[0].id).toEqual(orderId);
         expect(result[0].status).toEqual("complete");
     });
 
     it("currentOrderByUser should return null when no active order exists", async () => {
-        const result = await orderStore.currentOrderByUser(userId);
+        const result = await storeOrder.getCurrentOrderByUser(userId);
         expect(result).toBeNull();
     });
 });

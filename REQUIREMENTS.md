@@ -78,15 +78,6 @@ Join table representing the many-to-many relationship between orders and product
 | Field | Type | Constraints |
 |-------|------|-------------|
 | `id` | SERIAL | Primary Key |
-| `user_id` | INTEGER | Not Null, FK |
-| `status` | VARCHAR(20) | Not Null |
-
-### 4. `order_products`
-Join table representing the many-to-many relationship between orders and products.
-
-| Field | Type | Constraints |
-|-------|------|-------------|
-| `id` | SERIAL | Primary Key |
 | `order_id` | INTEGER | Not Null, FK |
 | `product_id` | INTEGER | Not Null, FK |
 | `quantity` | INTEGER | Not Null |

@@ -16,13 +16,9 @@ export default interface AppUser {
 export class AppUserStore {
     async index(): Promise<AppUser[]> {
         try {
-            const sql = 'SELECT id, firstName, lastName FROM AppUser;';
-            const result = await query(sql, []);
-            return result.map((row: any) => ({
-                id: row.id,
-                firstName: row.firstname,
-                lastName: row.lastname
-            }));
+            const sql = 'SELECT id, firstName AS "firstName", lastName AS "lastName" FROM AppUser;';
+            const result = (await query(sql, [])) as AppUser[];
+            return result;
         } catch (err) {
             throw new Error(`Could not get users: ${err}`);
         }
@@ -30,17 +26,12 @@ export class AppUserStore {
 
     async show(id: number): Promise<AppUser> {
         try {
-            const sql = 'SELECT id, firstName, lastName FROM AppUser WHERE id = $1;';
-            const result = await query(sql, [id]);
+            const sql = 'SELECT id, firstName AS "firstName", lastName AS "lastName" FROM AppUser WHERE id = $1;';
+            const result = (await query(sql, [id])) as AppUser[];
             if (result.length === 0) {
                 throw new Error(`User with id ${id} not found`);
             }
-            const row = result[0];
-            return {
-                id: row.id,
-                firstName: row.firstname,
-                lastName: row.lastname
-            };
+            return result[0];
         } catch (err) {
             throw new Error(`Could not get user: ${err}`);
         }
@@ -53,14 +44,13 @@ export class AppUserStore {
                 throw new Error('Password is required');
             }
             const hash = await bcrypt.hash(password + pepper, saltRounds);
-            const sql = 'INSERT INTO AppUser (firstName, lastName, password) VALUES ($1, $2, $3) RETURNING id, firstName, lastName;';
-            const result = await query(sql, [firstName, lastName, hash]);
-            const row = result[0];
-            return {
-                id: row.id,
-                firstName: row.firstname,
-                lastName: row.lastname
-            };
+            const sql = `
+                INSERT INTO AppUser (firstName, lastName, password)
+                VALUES ($1, $2, $3)
+                RETURNING id, firstName AS "firstName", lastName AS "lastName";
+            `;
+            const result = (await query(sql, [firstName, lastName, hash])) as AppUser[];
+            return result[0];
         } catch (err) {
             throw new Error(`Could not create user: ${err}`);
         }
@@ -68,22 +58,22 @@ export class AppUserStore {
 
     async authenticate(firstName: string, lastName: string, password: string): Promise<AppUser | null> {
         try {
-            const sql = 'SELECT id, firstName, lastName, password FROM AppUser WHERE firstName = $1 AND lastName = $2;';
-            const result = await query(sql, [firstName, lastName]) as AppUser[];
-            if (result.length > 0) {
-                const user = result[0];
-                const isCorrect = await bcrypt.compare(password + pepper, user.password as string);
-                if (isCorrect) {
-                    return {
-                        id: user.id,
-                        firstName: user.firstName,
-                        lastName: user.lastName
-                    };
-                }
-            }
-            return null;
+            const sql = 'SELECT id, firstName AS "firstName", lastName AS "lastName", password FROM AppUser WHERE firstName = $1 AND lastName = $2;';
+            const result = (await query(sql, [firstName, lastName])) as AppUser[];
+            if (result.length === 0)
+                return null;
+            const user = result[0];
+            if (!user.password)
+                return null;
+            const isCorrect = await bcrypt.compare(password + pepper, user.password);
+            if (isCorrect)
+                return user;
+            else
+                return null;
         } catch (err) {
             throw new Error(`Could not authenticate user: ${err}`);
         }
     }
 }
+
+export const storeAppUser = new AppUserStore();

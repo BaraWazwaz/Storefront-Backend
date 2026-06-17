@@ -44,7 +44,6 @@ async function setupDatabase() {
             return statuses.every(x => x);
         };
 
-        // Drop existing databases and roles if they exist, for safe re-run of command using this script.
         console.log('Dropping existing databases and users if they exist...');
         await client.query(`DROP DATABASE IF EXISTS ${DB_TEST_DB} WITH (FORCE);`);
         await client.query(`DROP DATABASE IF EXISTS ${DB_DEPLOY_DB} WITH (FORCE);`);
