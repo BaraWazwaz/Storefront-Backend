@@ -28,7 +28,7 @@ A RESTful API backend for a storefront application. Built using **TypeScript, Ex
 > **Note**: You can edit the `.env` file to your preferences before you proceed with the remaining steps (optional).
 
 ```bash
-yarn install
+yarn install --ignore-engines
 cp .env.example .env
 # Customize here
 docker-compose up -d
